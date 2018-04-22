@@ -42,6 +42,20 @@ class poloniex:
             response = self.webhandle.request('GET', 'https://poloniex.com/public?command=' + command)
             return json.loads(response.data.decode('utf-8'))
             
+        elif(command == "returnChartData"):
+            # example: 
+            # Call: https://poloniex.com/public?command=returnChartData&currencyPair=BTC_XMR&start=1405699200&end=9999999999&period=14400
+            # candlestick period in seconds; valid values are 300, 900, 1800, 7200, 14400, and 86400
+            # i.e. 5min, 15min, 30min, 2hour, 4hour, 24 hours
+            url = 'https://poloniex.com/public?command=' + command + \
+                '&currencyPair=' + str(req['currencyPair']) + \
+                '&start=' + str(createTimeStamp(req['StartDate'])) + \
+                '&end=' + str(createTimeStamp(req['EndDate'])) + \
+                '&period=' + str(req['Period'])
+            response = self.webhandle.request('GET', url)
+            return json.loads(response.data.decode('utf-8'))
+             
+             
         elif(command == "returnOrderBook"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
             return json.loads(ret.read())
@@ -67,6 +81,12 @@ class poloniex:
     def returnTicker(self):
         return self.api_query("returnTicker")
 
+    def returnChartData(self, currencyPair, StartDate, EndDate, Period = 900):
+        return self.api_query("returnChartData", {'currencyPair': currencyPair,
+                                                  'StartDate': StartDate,
+                                                  'EndDate': EndDate,
+                                                  'Period': Period})
+        
     def return24Volume(self):
         return self.api_query("return24Volume")
 
